@@ -1,4 +1,4 @@
-author: 2323122, aofall, AtomAlpaca, Bocity, CoelacanthusHex, countercurrent-time, Early0v0, Enter-tainer, fearlessxjdx, Great-designer, H-J-Granger, hsfzLZH1, iamtwz, Ir1d, ksyx, Marcythm, NachtgeistW, ouuan, Persdre, shuzhouliu, StudyingFather, SukkaW, Tiphereth-A, wsyhb, Yesphet, yuhuoji, lingkerio, bililateral, q-wind
+author: 2323122, aofall, AtomAlpaca, Bocity, CoelacanthusHex, countercurrent-time, Early0v0, Enter-tainer, fearlessxjdx, Great-designer, H-J-Granger, hsfzLZH1, iamtwz, Ir1d, ksyx, Marcythm, NachtgeistW, ouuan, Persdre, shuzhouliu, StudyingFather, SukkaW, Tiphereth-A, wsyhb, Yesphet, yuhuoji, lingkerio, bililateral, q-wind, JEB-Bem
 
 ## 定义
 
@@ -188,13 +188,11 @@ author: 2323122, aofall, AtomAlpaca, Bocity, CoelacanthusHex, countercurrent-tim
             delete root;
             return temp;
           } else {
-            TreeNode* successor = findMinNode(root->right);
+            // 找到后缀节点，也就是右子树中值最小的节点，并将这个节点删除
+            TreeNode* successor = detachMinNode(root->right);
             root->key = successor->key;
             root->count = successor->count;  // 更新重复数量
-            // 当 successor->count > 1时，也应该删除该节点，否则
-            // 后续的删除只会减少重复数量
-            successor->count = 1;
-            root->right = remove(root->right, successor->key);
+            delete successor;
           }
         }
       }
@@ -205,12 +203,22 @@ author: 2323122, aofall, AtomAlpaca, Bocity, CoelacanthusHex, countercurrent-tim
       return root;
     }
     
-    // 此处以右子树的最小值为例
-    TreeNode* findMinNode(TreeNode* root) {
-      while (root->left != nullptr) {
-        root = root->left;
+    // 此处以右子树的最小值为例，注意此处传入了指针的引用
+    TreeNode* detachMinNode(TreeNode*& node) {
+      if (node->lchild){
+        // 继续递归寻找后缀节点
+        Node *ret = detachMinNode(node->lchild);
+        // 更新这个节点的 size
+        node->size -= ret->tot;
+        return ret;
       }
-      return root;
+    
+      // 没有左子树，当前这个节点就是后缀节点
+      Node *ret = node;
+      // 把后缀节点从树上移除，其右子树接到父节点上
+      // （也就是对引用重新赋值）
+      node = node->rchild;
+      return ret;
     }
     ```
 
